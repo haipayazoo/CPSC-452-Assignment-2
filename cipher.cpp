@@ -34,6 +34,33 @@ void pad_zero(unsigned char** input)
 	}
 }
 
+//removes the zero padding from a string
+void pad_zero_remove(unsigned char** input)
+{
+	//find the end of the array
+	int endIndex = 0;
+	while(((char*)input)[endIndex] != '\0')
+	{
+		endIndex++;
+	}
+
+	//loop from the back to the front and eliminate all the '0' characters
+	//start at i=1 to ignore the last '\0' null terminator
+	for(int i = 1; i < 8; i++)
+	{
+		if(((char*)input)[endIndex - i] != '0')
+		{
+			//break the loop
+			i = 8;
+		}
+		else
+		{
+			//remove the character from the array
+			((char*)input)[endIndex - i] = '\0';
+		}
+	}
+}
+
 bool parseArguments(int argc,
 					char** argv,
 					enum cipher *argCipher,
@@ -197,8 +224,20 @@ int main(int argc, char** argv)
 		/* Perform encryption */
 		unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
 
-		//TODO: print the ciphertext to the output file
-		printf("CT: %s\n", cipherText);
+		if(cipherText != NULL)
+		{
+			//write to output file
+			int i = 0;
+			while(cipherText[i] != '\0')
+			{
+				outputFile.put(cipherText[i]);
+				i++;
+			}
+		}
+		else
+		{
+			printf("ERROR: result of encryption is NULL\n");
+		}
 
 		//free the
 		free(paddedPlainText);
@@ -219,16 +258,28 @@ int main(int argc, char** argv)
 			strcat(cipherText, inputBlock);
 		}
 
-		printf("CT: %s\n", cipherText);
-
 		/* Perform decryption */
 		unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);	
 
-		//TODO: remove padding
+		if(plainText != NULL)
+		{
+			//remove padding
+			pad_zero_remove((unsigned char**)&plainText);
 
-		//TODO: write to output file
-		printf("PT: %s\n", plainText);
+			//write to output file
+			int i = 0;
+			while(plainText[i] != '\0')
+			{
+				outputFile.put(plainText[i]);
+				i++;
+			}
+		}
+		else
+		{
+			printf("ERROR: result of decryption is NULL\n");
+		}
 
+		//clean up memory
 		free(cipherText);
 		
 		return 0;
