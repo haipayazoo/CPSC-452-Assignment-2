@@ -172,41 +172,59 @@ int main(int argc, char** argv)
 	if(argMode == encrypt)
 	{
 		//encrypt specific variables
-		char temp[8];
+		char inputBlock[8];
 		char* paddedPlainText = NULL;
 		int count = 0;
 
 		//read the data from the file
 		//loop while the input file is reading 8 characters (64 bits) at a time
-		while(inputFile.read(temp, 8))
+		while(inputFile.read(inputBlock, 8))
 		{
 			count++;
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * 8);
-			strcat(paddedPlainText, temp);
-			printf("DATA: %s\n", paddedPlainText);
+			strcat(paddedPlainText, inputBlock);
 		}
 
-		//with what is remaining in the temp var after the loop terminates
+		//with what is remaining in the inputBlock var after the loop terminates
 		//pad it and push it onto the plain text
-		pad_zero((unsigned char**)&temp);
+		pad_zero((unsigned char**)&inputBlock);
 		count++;
 		paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * 8);
-		strcat(paddedPlainText, temp);
+		strcat(paddedPlainText, inputBlock);
+
+		printf("PT: %s\n", paddedPlainText);
 		
 		/* Perform encryption */
 		unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
 
-		free(paddedPlainText);
-
 		//TODO: print the ciphertext to the output file
 		printf("CT: %s\n", cipherText);
+
+		//free the
+		free(paddedPlainText);
 	}
 	else if(argMode == decrypt)
 	{
-		/* Perform decryption */
-		//unsigned char* plainText = cipher->decrypt(cipherText);	
+		//decrypt specific variables
+		char inputBlock[8];
+		char* cipherText = NULL;
+		int count = 0;
 
-		//printf("PT: %s\n", plainText);
+		//read the data from the file
+		//loop while the input file is reading 8 characters (64 bits) at a time
+		while(inputFile.read(inputBlock, 8))
+		{
+			count++;
+			cipherText = (char*)realloc(cipherText, count * sizeof(char*) * 8);
+			strcat(cipherText, inputBlock);
+		}
+
+		printf("CT: %s\n", cipherText);
+
+		/* Perform decryption */
+		unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);	
+
+		printf("PT: %s\n", plainText);
 		
 		return 0;
 	}
