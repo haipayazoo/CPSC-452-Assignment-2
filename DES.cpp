@@ -69,8 +69,12 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 {
 	//LOGIC:
 	//1. Check to make sure that the block is exactly 8 characters (i.e. 64 bits)
+
+	int length = strlen((char*)plaintext);
+
 	if(strlen((char*)plaintext) != 8) {
-		std::cout << "Plaintext is not 8 characters!\n";
+		printf("Plaintext is not 8 characters! The length is: %d\n", length);
+
 		return 0;
 	}
 
