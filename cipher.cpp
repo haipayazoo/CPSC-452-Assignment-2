@@ -8,7 +8,7 @@
 using namespace std;
 
 //enums for the cipher and mode arguments
-enum cipher {aes, des};
+enum cipher {aes = 0, des = 1};
 enum mode {encrypt, decrypt};
 
 //takes a pointer to an array of characters and modifies the array
@@ -91,11 +91,6 @@ bool parseArguments(int argc,
 		return false;
 	}
 
-	//parse the key
-	*argKey = (unsigned char*)argv[2];
-
-	// TODO: validate key length (64 bits for des, 128 bits for aes)
-
 	//parse the mode
 	if(strcmp(argv[3], "ENC") == 0)
 	{
@@ -110,6 +105,32 @@ bool parseArguments(int argc,
 		printf("Incorrect mode [%s]\n", argv[3]);
 		return false;
 	}
+
+	//parse the key
+	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
+	//to indicate encryption or decryption
+	if(*argCipher == aes)
+	{
+		if(*argMode == encrypt)
+		{
+			*argKey = (unsigned char*)realloc(*argKey, sizeof(unsigned char) * 17);
+			strcpy((char*)*argKey, "0");
+			strcat((char*)*argKey, argv[2]);
+		}
+		else
+		{
+			*argKey = (unsigned char*)realloc(*argKey, sizeof(unsigned char) * 17);
+			strcpy((char*)*argKey, "1");
+			strcat((char*)*argKey, argv[2]);
+		}
+	}
+	else
+	{
+		//if its des just set the key normally
+		strcpy((char*)*argKey, argv[2]);
+	}
+
+	// TODO: validate key length (64 bits for des, 128 bits for aes)
 
 	//parse the input file
 	*argInputFile = (unsigned char*)argv[4];
@@ -144,6 +165,8 @@ int main(int argc, char** argv)
 	ifstream inputFile;
 	ofstream outputFile;
 
+	argKey = (unsigned char*)malloc(sizeof(unsigned char) * 8);
+
 	//parse arguments
 	if(!parseArguments(argc, argv, &argCipher, &argKey, &argMode, &argInputFile, &argOutputFile))
 	{
@@ -175,6 +198,7 @@ int main(int argc, char** argv)
 	 * Your program should take input from
 	 * command line.
 	 */
+	printf("SET KEY: %s\n", argKey);
 	cipher->setKey(argKey);
 
 	//open the input and output files
@@ -289,4 +313,6 @@ int main(int argc, char** argv)
 		printf("This should be un-reachable code\n");
 		exit(-1);
 	}
+
+	free(argKey);
 }
