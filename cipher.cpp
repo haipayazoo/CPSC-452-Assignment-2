@@ -1,4 +1,6 @@
 #include <string>
+#include <fstream>
+#include <vector>
 #include "CipherInterface.h"
 #include "DES.h"
 #include "AES.h"
@@ -8,6 +10,29 @@ using namespace std;
 //enums for the cipher and mode arguments
 enum cipher {aes, des};
 enum mode {encrypt, decrypt};
+
+//takes a pointer to an array of characters and modifies the array
+//to pad the array at and after the last '\n' character
+void pad_zero(unsigned char** input)
+{
+	//search the array from the back to the front to find the last instance of a '\n' character
+	for(int i = 7; i >= 0; --i)
+	{
+		//if the character is a newline character
+		if(((char*)input)[i] == '\n')
+		{
+			//set the character to the pad
+			((char*)input)[i] = '0';
+			//break the loop
+			i = 0;
+		}
+		else//if the newline character has yet to be found
+		{
+			//set the pad
+			((char*)input)[i] = '0';
+		}
+	}
+}
 
 bool parseArguments(int argc,
 					char** argv,
@@ -89,6 +114,9 @@ int main(int argc, char** argv)
 	unsigned char *argInputFile;
 	unsigned char *argOutputFile;
 
+	ifstream inputFile;
+	ofstream outputFile;
+
 	//parse arguments
 	if(!parseArguments(argc, argv, &argCipher, &argKey, &argMode, &argInputFile, &argOutputFile))
 	{
@@ -121,16 +149,70 @@ int main(int argc, char** argv)
 	 * command line.
 	 */
 	cipher->setKey(argKey);
-	
-	/* Perform encryption */
-	unsigned char* cipherText = cipher->encrypt((unsigned char*)"hello world");
 
-	printf("CT: %s\n", cipherText);
-	
-	/* Perform decryption */
-	unsigned char* plainText = cipher->decrypt(cipherText);	
+	//open the input and output files
+	inputFile.open((char*)argInputFile);
+	outputFile.open((char*)argOutputFile);
 
-	printf("PT: %s\n", plainText);
-	
-	return 0;
+	//make sure the input file is working
+	if(!inputFile.is_open())
+	{
+		printf("Error opening file: %s\n", argInputFile);
+		exit(-1);
+	}
+
+	//make sure the output file is working
+	if(!outputFile.is_open())
+	{
+		printf("Error opening file: %s\n", argOutputFile);
+		exit(-1);
+	}
+
+	//perform encryption or decryption based on the argMode
+	if(argMode == encrypt)
+	{
+		//encrypt specific variables
+		char temp[8];
+		char* paddedPlainText = NULL;
+		int count = 0;
+
+		//read the data from the file
+		//loop while the input file is reading 8 characters (64 bits) at a time
+		while(inputFile.read(temp, 8))
+		{
+			count++;
+			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * 8);
+			strcat(paddedPlainText, temp);
+			printf("DATA: %s\n", paddedPlainText);
+		}
+
+		//with what is remaining in the temp var after the loop terminates
+		//pad it and push it onto the plain text
+		pad_zero((unsigned char**)&temp);
+		count++;
+		paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * 8);
+		strcat(paddedPlainText, temp);
+		
+		/* Perform encryption */
+		unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
+
+		free(paddedPlainText);
+
+		//TODO: print the ciphertext to the output file
+		printf("CT: %s\n", cipherText);
+	}
+	else if(argMode == decrypt)
+	{
+		/* Perform decryption */
+		//unsigned char* plainText = cipher->decrypt(cipherText);	
+
+		//printf("PT: %s\n", plainText);
+		
+		return 0;
+	}
+	else
+	{
+		printf("This should be un-reachable code\n");
+		exit(-1);
+	}
 }
