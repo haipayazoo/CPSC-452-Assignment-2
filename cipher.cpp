@@ -224,7 +224,12 @@ int main(int argc, char** argv)
 		/* Perform decryption */
 		unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);	
 
+		//TODO: remove padding
+
+		//TODO: write to output file
 		printf("PT: %s\n", plainText);
+
+		free(cipherText);
 		
 		return 0;
 	}
