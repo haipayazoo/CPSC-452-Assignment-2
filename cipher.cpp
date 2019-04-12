@@ -256,6 +256,10 @@ int main(int argc, char** argv)
 		while(inputFile.read(inputBlock, blockSize))
 		{
 			printf("inputBlock %s\n", inputBlock);
+			int len=sizeof(inputBlock)/sizeof(unsigned char);
+			if( len<blockSize){
+				pad_zero((unsigned char**)&inputBlock);	
+			}
 			count++;
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
@@ -307,6 +311,7 @@ int main(int argc, char** argv)
 		//loop while the input file is reading 8 characters (64 bits) at a time
 		while(inputFile.read(inputBlock, blockSize))
 		{
+			
 			count++;
 			unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
 			cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
