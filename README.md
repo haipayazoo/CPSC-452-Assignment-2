@@ -11,6 +11,10 @@ The implementation of the AES and DES ciphers.
 * Randy Le: randy.l5933@csu.fullerton.edu
 
 ## Usage
+Compile the program with the Makefile
+`make`
+then proceed with the program with the following command format:
+`./cipher <DES/AES> <KEY> <ENC/DEC> <inputfile> <outputfile>`
 
 ## Bugs
 
