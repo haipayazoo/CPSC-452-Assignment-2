@@ -143,14 +143,6 @@ bool parseArguments(int argc,
 
 int main(int argc, char** argv)
 {
-	/**
-	 * TODO: Replace the code below	with your code which can SWITCH
-	 * between DES and AES and encrypt files. DO NOT FORGET TO PAD
-	 * THE LAST BLOCK IF NECESSARY.
-	 *
-	 * NOTE: due to the incomplete skeleton, the code may crash or
-	 * misbehave.
-	 */
 
 	/* Create an instance of the DES cipher */
 	CipherInterface* cipher = NULL;
