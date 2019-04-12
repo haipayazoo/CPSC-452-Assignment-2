@@ -238,7 +238,8 @@ int main(int argc, char** argv)
 	if(argMode == encrypt)
 	{
 		//encrypt specific variables
-		char inputBlock[blockSize];
+		char inputBlock[blockSize+1];
+		inputBlock[blockSize]='\0';
 		char* paddedPlainText = NULL;
 		int count = 0;
 		unsigned char* cipherText= NULL;
