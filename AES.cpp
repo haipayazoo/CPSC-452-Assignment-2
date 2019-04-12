@@ -25,21 +25,22 @@ bool AES::setKey(const unsigned char* keyArray)
 	// Both functions return 0 on success and other values on faliure.
 	// For documentation, please see https://boringssl.googlesource.com/boringssl/+/2623/include/openssl/aes.h
 	// and aes.cpp example provided with the assignment.
-	unsigned char key[16];
-	printf("This works out well\n");
+	unsigned char* key = new unsigned char[16];
+
 	// Copy key out of keyArray
-	for (int i = 1; i < 17; i++) {
+	for (int i = 1; i < 17; i++)
+	{
 		key[i-1] = keyArray[i];
 	}
-	printf("This works out well\n");
 
-	if (keyArray[0] == 0) {
-		printf("This works out well\n");
+	if (keyArray[0] == '0')
+	{
 
 		// Encrypting
 		return AES_set_encrypt_key(key, 128, &this->enc_key);
-	} else {
-		printf("This works out well\n");
+	}
+	else
+	{
 
 		// Decrypting
 		return AES_set_decrypt_key(key, 128, &this->dec_key);
@@ -53,21 +54,18 @@ bool AES::setKey(const unsigned char* keyArray)
  */
 unsigned char* AES::encrypt(const unsigned char* plainText)
 {
-	printf("This works out well\n");
 
 	//	1. Dynamically allocate a block to store the ciphertext.
 
-	unsigned char* out = new unsigned char[16];
-	printf("This works out well, yeah?\n");
+	unsigned char* out = new unsigned char[17];
 
 	//	2. Use AES_ecb_encrypt(...) to encrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
 
-	// TODO THE PROBLEM RESIDES HERE
+	// TODO THE PROBLEM RESIDES HERE. Getting segmentation dump error on this!
 	AES_ecb_encrypt(plainText, out, &this->enc_key, AES_ENCRYPT);
 
 	// 	3. Return the pointer to the ciphertext
-	printf("This works out well\n");
 
 	return out;
 }
@@ -82,7 +80,7 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 
 	//	1. Dynamically allocate a block to store the plaintext.
 
-	unsigned char* out = new unsigned char[16];
+	unsigned char* out = new unsigned char[17];
 
 	//	2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
