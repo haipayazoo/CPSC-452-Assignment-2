@@ -62,12 +62,12 @@ void pad_zero_remove(unsigned char** input)
 }
 
 bool parseArguments(int argc,
-					char** argv,
-					enum cipher *argCipher,
-					unsigned char **argKey,
-					enum mode *argMode,
-					unsigned char **argInputFile,
-					unsigned char **argOutputFile)
+		char** argv,
+		enum cipher *argCipher,
+		unsigned char **argKey,
+		enum mode *argMode,
+		unsigned char **argInputFile,
+		unsigned char **argOutputFile)
 {
 	//check number of arguments
 	if(argc != 6)
@@ -152,8 +152,8 @@ int main(int argc, char** argv)
 	 * misbehave.
 	 */
 
-	/* Create an instance of the DES cipher */	
-	CipherInterface* cipher = NULL; 
+	/* Create an instance of the DES cipher */
+	CipherInterface* cipher = NULL;
 
 	//create variables for the cipher and mode
 	enum cipher argCipher;
@@ -187,8 +187,8 @@ int main(int argc, char** argv)
 	/* Error checks */
 	if(!cipher)
 	{
-		fprintf(stderr, "ERROR [%s %s %d]: could not allocate memory\n",	
-		__FILE__, __FUNCTION__, __LINE__);
+		fprintf(stderr, "ERROR [%s %s %d]: could not allocate memory\n",
+				__FILE__, __FUNCTION__, __LINE__);
 		exit(-1);
 	}
 
@@ -219,6 +219,27 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
+	// TODO: implement this pseudocode
+	// ###############################
+
+	// if DES
+		// SIZE = 8
+	// else
+		// SIZE = 16
+
+	// While there are still bytes in the input file, loop
+	//
+		// create a block datas tructure
+		// pad block to SIZE bytes
+
+		// create an output data structure
+		// if encrypting
+			// output = encrypt(stuff)
+		// else
+			// output = decrypt(stuff)
+
+		// write output to file
+
 	//perform encryption or decryption based on the argMode
 	if(argMode == encrypt)
 	{
@@ -244,7 +265,7 @@ int main(int argc, char** argv)
 		strcat(paddedPlainText, inputBlock);
 
 		printf("PT: %s\n", paddedPlainText);
-		
+
 		/* Perform encryption */
 		unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
 
@@ -283,7 +304,7 @@ int main(int argc, char** argv)
 		}
 
 		/* Perform decryption */
-		unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);	
+		unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);
 
 		if(plainText != NULL)
 		{
@@ -305,7 +326,7 @@ int main(int argc, char** argv)
 
 		//clean up memory
 		free(cipherText);
-		
+
 		return 0;
 	}
 	else
