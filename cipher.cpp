@@ -244,10 +244,10 @@ int main(int argc, char** argv)
 		unsigned char* cipherText= NULL;
 		//read the data from the file
 		//loop while the input file is reading 8 characters (64 bits) at a time
-		printf("begging loop%d\n",blockSize);
+		printf("beging loop block size=%d\n",blockSize);
 		while(inputFile.read(inputBlock, blockSize))
 		{
-			printf("inputBlock %s\n", inputBlock);
+			printf("inputBlock number%d= %s\n",count, inputBlock);
 			count++;
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
@@ -260,13 +260,14 @@ int main(int argc, char** argv)
 
 		int len=sizeof(inputBlock)/sizeof(unsigned char);
 	//	if( len<blockSize){
+			printf("inputBlock number%d= %s\n",count, inputBlock);
 			pad_zero((unsigned char**)&inputBlock);	
 			count++;
 			printf("input after padding:%s\n", inputBlock);
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
 			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
-			printf("temp %s\n", temp);
+			printf("CT of input block number%d= %s\n",count-1, temp);
 			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
 			strcat((char*)cipherText,(char*) temp);
 	//	}
@@ -313,22 +314,24 @@ int main(int argc, char** argv)
 		//loop while the input file is reading 8 characters (64 bits) at a time
 		while(inputFile.read(inputBlock, blockSize))
 		{
-			
+			printf("inputBlock number%d= %s\n",count, inputBlock);
 			count++;
 			unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
 			cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
 			strcat(cipherText, inputBlock);
 			plainText = (unsigned char*)realloc(plainText, count * sizeof(unsigned char*) * blockSize);
 			strcat((char*)plainText,(char*) temp);
+			printf("inputBlock number%d decrypted= %s\n",count-1, temp);
 		}
 
-		
+		printf("inputBlock number%d= %s\n",count, inputBlock);
 		count++;
 		unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
 		cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
 		strcat(cipherText, inputBlock);
 		plainText = (unsigned char*)realloc(plainText, count * sizeof(unsigned char*) * blockSize);
 		strcat((char*)plainText,(char*) temp);
+		printf("inputBlock number%d decrypted= %s\n",count-1, temp);
 		/* Perform decryption */
 		//unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);
 		printf("CT:%s\n",cipherText);
