@@ -322,6 +322,13 @@ int main(int argc, char** argv)
 			strcat((char*)plainText,(char*) temp);
 		}
 
+		
+		count++;
+		unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
+		cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
+		strcat(cipherText, inputBlock);
+		plainText = (unsigned char*)realloc(plainText, count * sizeof(unsigned char*) * blockSize);
+		strcat((char*)plainText,(char*) temp);
 		/* Perform decryption */
 		//unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);
 		printf("CT:%s\n",cipherText);
