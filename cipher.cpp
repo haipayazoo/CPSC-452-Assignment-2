@@ -259,16 +259,17 @@ int main(int argc, char** argv)
 
 
 		int len=sizeof(inputBlock)/sizeof(unsigned char);
-		if( len<blockSize){
+	//	if( len<blockSize){
 			pad_zero((unsigned char**)&inputBlock);	
-		
+			count++;
+			printf("input after padding:%s\n", inputBlock);
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
 			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
 			printf("temp %s\n", temp);
 			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
 			strcat((char*)cipherText,(char*) temp);
-		}
+	//	}
 		
 		//with what is remaining in the inputBlock var after the loop terminates
 		//pad it and push it onto the plain text
