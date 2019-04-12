@@ -281,8 +281,7 @@ int main(int argc, char** argv)
 
 		printf("PT: %s\n", paddedPlainText);
 		printf("CT: %s\n", cipherText);
-		/* Perform encryption */
-		//unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
+		
 
 		if(cipherText != NULL)
 		{
@@ -324,22 +323,13 @@ int main(int argc, char** argv)
 			printf("inputBlock number%d decrypted= %s\n",count-1, temp);
 		}
 
-		printf("inputBlock number%d= %s\n",count, inputBlock);
-		count++;
-		unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
-		cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
-		strcat(cipherText, inputBlock);
-		plainText = (unsigned char*)realloc(plainText, count * sizeof(unsigned char*) * blockSize);
-		strcat((char*)plainText,(char*) temp);
-		printf("inputBlock number%d decrypted= %s\n",count-1, temp);
-		/* Perform decryption */
-		//unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);
+		
+		
 		printf("CT:%s\n",cipherText);
 		printf("PT:%s\n", plainText);
 		if(plainText != NULL)
 		{
-			//remove padding
-			//pad_zero_remove((unsigned char**)&plainText);
+			
 
 			//write to output file
 			int i = 0;
