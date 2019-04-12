@@ -252,7 +252,7 @@ int main(int argc, char** argv)
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
 			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
-			printf("temp %s\n", temp);
+			printf("input block number%d CT= %s\n",count-1, temp);
 			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
 			strcat((char*)cipherText,(char*) temp);
 		}
