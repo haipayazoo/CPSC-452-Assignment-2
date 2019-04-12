@@ -238,7 +238,8 @@ int main(int argc, char** argv)
 	if(argMode == encrypt)
 	{
 		//encrypt specific variables
-		char inputBlock[blockSize];
+		char inputBlock[blockSize+1];
+		inputBlock[blockSize]='\0';
 		char* paddedPlainText = NULL;
 		int count = 0;
 		unsigned char* cipherText= NULL;
@@ -261,7 +262,7 @@ int main(int argc, char** argv)
 		int len=sizeof(inputBlock)/sizeof(unsigned char);
 	//	if( len<blockSize){
 			printf("inputBlock number%d= %s\n",count, inputBlock);
-			pad_zero((unsigned char**)&inputBlock);	
+			pad_zero((unsigned char**)&inputBlock);
 			count++;
 			printf("input after padding:%s\n", inputBlock);
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
@@ -271,7 +272,7 @@ int main(int argc, char** argv)
 			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
 			strcat((char*)cipherText,(char*) temp);
 	//	}
-		
+
 		//with what is remaining in the inputBlock var after the loop terminates
 		//pad it and push it onto the plain text
 		//pad_zero((unsigned char**)&inputBlock);
@@ -281,7 +282,7 @@ int main(int argc, char** argv)
 
 		printf("PT: %s\n", paddedPlainText);
 		printf("CT: %s\n", cipherText);
-		
+
 
 		if(cipherText != NULL)
 		{
@@ -305,7 +306,8 @@ int main(int argc, char** argv)
 	else if(argMode == decrypt)
 	{
 		//decrypt specific variables
-		char inputBlock[8];
+		char inputBlock[blockSize+1];
+		inputBlock[blockSize]='\0';
 		char* cipherText = NULL;
 		int count = 0;
 		unsigned char* plainText=NULL;
@@ -323,13 +325,13 @@ int main(int argc, char** argv)
 			printf("inputBlock number%d decrypted= %s\n",count-1, temp);
 		}
 
-		
-		
+
+
 		printf("CT:%s\n",cipherText);
 		printf("PT:%s\n", plainText);
 		if(plainText != NULL)
 		{
-			
+
 
 			//write to output file
 			int i = 0;
