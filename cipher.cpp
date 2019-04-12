@@ -271,6 +271,8 @@ int main(int argc, char** argv)
 			printf("CT of input block number%d= %s\n",count-1, temp);
 			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
 			strcat((char*)cipherText,(char*) temp);
+			cipherText=(unsigned char*)realloc(cipherText, (count * sizeof(unsigned char*) *blockSize)+1);
+			strcat((char*)cipherText,"\0");
 	//	}
 
 		//with what is remaining in the inputBlock var after the loop terminates
