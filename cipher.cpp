@@ -306,7 +306,8 @@ int main(int argc, char** argv)
 	else if(argMode == decrypt)
 	{
 		//decrypt specific variables
-		char inputBlock[8];
+		char inputBlock[blockSize+1];
+		inputBlock[blockSize]='\0';
 		char* cipherText = NULL;
 		int count = 0;
 		unsigned char* plainText=NULL;
