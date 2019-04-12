@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 	enum mode argMode;
 	unsigned char *argInputFile;
 	unsigned char *argOutputFile;
-
+	int blockSize=8;
 	ifstream inputFile;
 	ofstream outputFile;
 
@@ -170,9 +170,11 @@ int main(int argc, char** argv)
 	if(argCipher == aes)
 	{
 		cipher = new AES();
+		blockSize=16;
 	}
 	else if(argCipher == des)
 	{
+		blockSize=8;
 		cipher = new DES();
 	}
 
@@ -236,30 +238,36 @@ int main(int argc, char** argv)
 	if(argMode == encrypt)
 	{
 		//encrypt specific variables
-		char inputBlock[8];
+		char inputBlock[blockSize];
 		char* paddedPlainText = NULL;
 		int count = 0;
-
+		unsigned char* cipherText= NULL;
 		//read the data from the file
 		//loop while the input file is reading 8 characters (64 bits) at a time
-		while(inputFile.read(inputBlock, 8))
+		printf("begging loop%d\n",blockSize);
+		while(inputFile.read(inputBlock, blockSize))
 		{
+			printf("inputBlock %s\n", inputBlock);
 			count++;
-			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * 8);
+			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
+			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
+			printf("temp %s\n", temp);
+			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
+			strcat((char*)cipherText,(char*) temp);
 		}
 
 		//with what is remaining in the inputBlock var after the loop terminates
 		//pad it and push it onto the plain text
-		pad_zero((unsigned char**)&inputBlock);
-		count++;
-		paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * 8);
-		strcat(paddedPlainText, inputBlock);
+		//pad_zero((unsigned char**)&inputBlock);
+		//count++;
+		//paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
+		//strcat(paddedPlainText, inputBlock);
 
 		printf("PT: %s\n", paddedPlainText);
-
+		printf("CT: %s\n", cipherText);
 		/* Perform encryption */
-		unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
+		//unsigned char* cipherText = cipher->encrypt((unsigned char*)paddedPlainText);
 
 		if(cipherText != NULL)
 		{
@@ -278,6 +286,7 @@ int main(int argc, char** argv)
 
 		//free the
 		free(paddedPlainText);
+		free(cipherText);
 	}
 	else if(argMode == decrypt)
 	{
@@ -285,23 +294,27 @@ int main(int argc, char** argv)
 		char inputBlock[8];
 		char* cipherText = NULL;
 		int count = 0;
-
+		unsigned char* plainText=NULL;
 		//read the data from the file
 		//loop while the input file is reading 8 characters (64 bits) at a time
-		while(inputFile.read(inputBlock, 8))
+		while(inputFile.read(inputBlock, blockSize))
 		{
 			count++;
-			cipherText = (char*)realloc(cipherText, count * sizeof(char*) * 8);
+			unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
+			cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
 			strcat(cipherText, inputBlock);
+			plainText = (unsigned char*)realloc(plainText, count * sizeof(unsigned char*) * blockSize);
+			strcat((char*)plainText,(char*) temp);
 		}
 
 		/* Perform decryption */
-		unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);
-
+		//unsigned char* plainText = cipher->decrypt((unsigned char*)cipherText);
+		printf("CT:%s\n",cipherText);
+		printf("PT:%s\n", plainText);
 		if(plainText != NULL)
 		{
 			//remove padding
-			pad_zero_remove((unsigned char**)&plainText);
+			//pad_zero_remove((unsigned char**)&plainText);
 
 			//write to output file
 			int i = 0;
