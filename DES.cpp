@@ -49,7 +49,7 @@ bool DES::setKey(const unsigned char* keyArray)
 
 
 	/* Set the encryption key */
-	if ((keyErrorCode = des_set_key_checked(&des_key, this->key)) != 0)
+	if ((keyErrorCode = DES_set_key_checked(&des_key, &this->key)) != 0)
 	{
 		fprintf(stderr, "\nkey error %d\n", keyErrorCode);
 
@@ -86,7 +86,7 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	block[1] = ctol(text + 4);
 
 	//5. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
-	des_encrypt1(block, this->key, 1);
+	DES_encrypt1(block, &this->key, 1);
 
 	//6. Convert the first ciphertext long to 4 characters using ltoc()
 	ltoc(block[0], encrypted_text);
@@ -131,7 +131,7 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 	block[1] = ctol(text + 4);
 
 	//5. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
-	des_encrypt1(block, this->key, 0);
+	DES_encrypt1(block, &this->key, 0);
 
 	//6. Convert the first ciphertext long to 4 characters using ltoc()
 	ltoc(block[0], decrypted_text);
