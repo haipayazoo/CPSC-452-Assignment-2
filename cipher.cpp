@@ -252,7 +252,7 @@ int main(int argc, char** argv)
 		unsigned char* cipherText= NULL;
 		//read the data from the file
 		//loop while the input file is reading 8 characters (64 bits) at a time
-		printf("begging loop%d",blockSize);
+		printf("begging loop%d\n",blockSize);
 		while(inputFile.read(inputBlock, blockSize))
 		{
 			printf("inputBlock %s\n", inputBlock);
