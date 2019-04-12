@@ -70,14 +70,6 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	//LOGIC:
 	//1. Check to make sure that the block is exactly 8 characters (i.e. 64 bits)
 
-	int length = strlen((char*)plaintext);
-
-	if(length != 8) {
-		printf("Plaintext is not 8 characters! The length is: %d\n", length);
-
-		return 0;
-	}
-
 	unsigned char text[8];
 	unsigned char encrypted_text[8];
 
@@ -122,14 +114,6 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 {
 	//LOGIC:
 	//1. Check to make sure that the block is exactly 8 characters (i.e. 64 bits)
-
-	int length = strlen((char*)ciphertext);
-
-	if(length != 8) {
-		printf("Ciphertext is not 8 characters! The length is: %d\n", length);
-
-		return 0;
-	}
 
 	unsigned char text[8];
 	unsigned char decrypted_text[8];
