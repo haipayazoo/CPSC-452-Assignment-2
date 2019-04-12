@@ -72,7 +72,7 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 
 	int length = strlen((char*)plaintext);
 
-	if(strlen((char*)plaintext) != 8) {
+	if(length != 8) {
 		printf("Plaintext is not 8 characters! The length is: %d\n", length);
 
 		return 0;
@@ -121,7 +121,49 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 unsigned char* DES::decrypt(const unsigned char* ciphertext)
 {
 	//LOGIC:
-	// Same logic as encrypt(), except in step 5. decrypt instead of encrypting
+	//1. Check to make sure that the block is exactly 8 characters (i.e. 64 bits)
+
+	int length = strlen((char*)ciphertext);
+
+	if(length != 8) {
+		printf("Ciphertext is not 8 characters! The length is: %d\n", length);
+
+		return 0;
+	}
+
+	unsigned char text[8];
+	unsigned char decrypted_text[8];
+
+	for(int i = 0; i < 8; i++)
+		text[i] = ciphertext[i];
+
+	//2. Declate an array DES_LONG block[2];
+	DES_LONG block[2];
+
+	//3. Use ctol() to convert the first 4 chars into long; store the result in block[0]
+	block[0] = ctol(text);
+
+	//4. Use ctol() to convert the second 4 chars into long; store the resul in block[1]
+	block[1] = ctol(text + 4);
+
+	//5. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
+	des_encrypt1(block, this->key, 0);
+
+	//6. Convert the first ciphertext long to 4 characters using ltoc()
+	ltoc(block[0], decrypted_text);
+
+	//7. Convert the second ciphertext long to 4 characters using ltoc()
+	ltoc(block[1], decrypted_text + 4);
+
+	//8. Save the results in the the dynamically allocated char array
+	unsigned char* plaintext = new unsigned char[8];
+
+	for(int i = 0; i < 8; i++)
+		plaintext[i] = decrypted_text[i];
+
+	//9. Return the pointer to the dynamically allocated array.
+
+	return plaintext;
 }
 
 /**
