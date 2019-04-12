@@ -248,10 +248,6 @@ int main(int argc, char** argv)
 		while(inputFile.read(inputBlock, blockSize))
 		{
 			printf("inputBlock %s\n", inputBlock);
-			int len=sizeof(inputBlock)/sizeof(unsigned char);
-			if( len<blockSize){
-				pad_zero((unsigned char**)&inputBlock);	
-			}
 			count++;
 			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
 			strcat(paddedPlainText, inputBlock);
@@ -261,6 +257,19 @@ int main(int argc, char** argv)
 			strcat((char*)cipherText,(char*) temp);
 		}
 
+
+		int len=sizeof(inputBlock)/sizeof(unsigned char);
+		if( len<blockSize){
+			pad_zero((unsigned char**)&inputBlock);	
+		
+			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
+			strcat(paddedPlainText, inputBlock);
+			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
+			printf("temp %s\n", temp);
+			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
+			strcat((char*)cipherText,(char*) temp);
+		}
+		
 		//with what is remaining in the inputBlock var after the loop terminates
 		//pad it and push it onto the plain text
 		//pad_zero((unsigned char**)&inputBlock);
