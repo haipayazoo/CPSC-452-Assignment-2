@@ -54,6 +54,32 @@ bool parseArguments(int argc,
   }
 
 
+	// Parse the key
+	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
+	//to indicate encryption or decryption
+	//parse the key
+	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
+	//to indicate encryption or decryption
+	if(*argCipher == aes)
+	{
+		if(*argMode == encrypt)
+		{
+			*argKey = (unsigned char*)realloc(*argKey, sizeof(unsigned char) * 17);
+			strcpy((char*)*argKey, "0");
+			strcat((char*)*argKey, argv[2]);
+		}
+		else
+		{
+			*argKey = (unsigned char*)realloc(*argKey, sizeof(unsigned char) * 17);
+			strcpy((char*)*argKey, "1");
+			strcat((char*)*argKey, argv[2]);
+		}
+	}
+	else
+	{
+		//if its des just set the key normally
+		strcpy((char*)*argKey, argv[2]);
+	}
 
 
 
@@ -85,6 +111,8 @@ int main(int argc, char** argv)
   unsigned char* block;
   unsigned char* text_buffer;
 
+	argKey = (unsigned char*)malloc(sizeof(unsigned char) * 8);
+
   // Parse arguments
 	if(!parseArguments(argc, argv, &argCipher, &argKey, &argMode, &argInputFile, &argOutputFile))
 	{
@@ -95,40 +123,7 @@ int main(int argc, char** argv)
 	/* TODO I'm getting weird errors when I put this in the parseArguments function. See if anyone
 		 you guys can try to figure out how to get this code working in that function*/
 
-	// Parse the key
-	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
-	//to indicate encryption or decryption
-  string key = argv[2];
 
-  if(argCipher == des)
-  {
-		argKey = new unsigned char[16];
-
-    for(int i = 0; i < 16; i++)
-
-    	argKey[i] = key[i];
-
-
-  }
-  else
-  {
-
-		argKey = new unsigned char[17];
-
-
-    if(argMode == encrypt)
-    {
-      argKey[0] = '0';
-    }
-    else
-    {
-      argKey[0] = '1';
-    }
-
-    for(int i = 1; i < 17; i++)
-			argKey[i] = key[i-1];
-
-  }
 
   //initialize the cipher
   if(argCipher == aes) { cipher = new AES(); }
