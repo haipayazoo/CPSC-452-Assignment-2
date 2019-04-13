@@ -1,7 +1,7 @@
 # CPSC-452-Assignment-2
 The implementation of the AES and DES ciphers.
 
-### Language Uses: C++
+### Language Used: C++
 
 ## Team Members
 * Coleman Nugent: colemannugent@csu.fullerton.edu
@@ -16,6 +16,8 @@ Compile the program with the Makefile
 then proceed with the program with the following command format:
 `./cipher <DES/AES> <KEY> <ENC/DEC> <inputfile> <outputfile>`
 
-## Bugs
+## Extra Credit
+No extra credit was done for this assignment.
 
 ## Additional Notes
+Nothing special to note.
