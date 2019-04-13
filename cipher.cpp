@@ -1,201 +1,143 @@
 #include <string>
+#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
+#include <string>
 #include "CipherInterface.h"
 #include "DES.h"
 #include "AES.h"
 
 using namespace std;
 
-//enums for the cipher and mode arguments
 enum cipher {aes = 0, des = 1};
 enum mode {encrypt, decrypt};
-
-//takes a pointer to an array of characters and modifies the array
-//to pad the array at and after the last '\n' character
-void pad_zero(unsigned char** input)
-{
-	//search the array from the back to the front to find the last instance of a '\n' character
-	for(int i = 7; i >= 0; --i)
-	{
-		//if the character is a newline character
-		if(((char*)input)[i] == '\n')
-		{
-			//set the character to the pad
-			((char*)input)[i] = '0';
-			//break the loop
-			i = 0;
-		}
-		else//if the newline character has yet to be found
-		{
-			//set the pad
-			((char*)input)[i] = '0';
-		}
-	}
-}
-
-//removes the zero padding from a string
-void pad_zero_remove(unsigned char** input)
-{
-	//find the end of the array
-	int endIndex = 0;
-	while(((char*)input)[endIndex] != '\0')
-	{
-		endIndex++;
-	}
-
-	//loop from the back to the front and eliminate all the '0' characters
-	//start at i=1 to ignore the last '\0' null terminator
-	for(int i = 1; i < 8; i++)
-	{
-		if(((char*)input)[endIndex - i] != '0')
-		{
-			//break the loop
-			i = 8;
-		}
-		else
-		{
-			//remove the character from the array
-			((char*)input)[endIndex - i] = '\0';
-		}
-	}
-}
 
 bool parseArguments(int argc,
 		char** argv,
 		enum cipher *argCipher,
-		unsigned char **argKey,
+		unsigned char** argKey,
 		enum mode *argMode,
-		unsigned char **argInputFile,
-		unsigned char **argOutputFile)
+		unsigned char** argInputFile,
+		unsigned char** argOutputFile)
 {
-	//check number of arguments
-	if(argc != 6)
-	{
-		printf("Incorrect number of arguments\n");
-		return false;
-	}
+  // Check number of arguments
+  if(argc != 6)
+  {
+    printf("Incorrect number of arguments\n");
+    return false;
+  }
 
-	//parse the cipher
-	if(strcmp(argv[1], "AES") == 0)
-	{
-		*argCipher = aes;
-	}
-	else if(strcmp(argv[1], "DES") == 0)
-	{
-		*argCipher = des;
-	}
-	else
-	{
-		printf("Incorrect cipher [%s]\n", argv[1]);
-		return false;
-	}
+  // Parse the cipher
+  if(strcmp(argv[1], "AES") == 0)
+  {
+    *argCipher = aes;
+  }
+  else if(strcmp(argv[1], "DES") == 0)
+  {
+    *argCipher = des;
+  }
 
-	//parse the mode
-	if(strcmp(argv[3], "ENC") == 0)
-	{
-		*argMode = encrypt;
-	}
-	else if(strcmp(argv[3], "DEC") == 0)
-	{
-		*argMode = decrypt;
-	}
-	else
-	{
-		printf("Incorrect mode [%s]\n", argv[3]);
-		return false;
-	}
+  //parse the mode
+  if(strcmp(argv[3], "ENC") == 0)
+  {
+    *argMode = encrypt;
+  }
+  else if(strcmp(argv[3], "DEC") == 0)
+  {
+    *argMode = decrypt;
+  }
+  else
+  {
+    printf("Incorrect mode [%s]\n", argv[3]);
+    return false;
+  }
 
-	//parse the key
-	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
-	//to indicate encryption or decryption
-	if(*argCipher == aes)
-	{
-		if(*argMode == encrypt)
-		{
-			*argKey = (unsigned char*)realloc(*argKey, sizeof(unsigned char) * 17);
-			strcpy((char*)*argKey, "0");
-			strcat((char*)*argKey, argv[2]);
-		}
-		else
-		{
-			*argKey = (unsigned char*)realloc(*argKey, sizeof(unsigned char) * 17);
-			strcpy((char*)*argKey, "1");
-			strcat((char*)*argKey, argv[2]);
-		}
-	}
-	else
-	{
-		//if its des just set the key normally
-		strcpy((char*)*argKey, argv[2]);
-	}
 
-	// TODO: validate key length (64 bits for des, 128 bits for aes)
 
-	//parse the input file
+
+
+	// Parse the input file
 	*argInputFile = (unsigned char*)argv[4];
 
-	//parse the output file
+	// Parse the output file
 	*argOutputFile = (unsigned char*)argv[5];
 
 	return true;
+
 }
 
 int main(int argc, char** argv)
 {
 
-	/* Create an instance of the DES cipher */
-	CipherInterface* cipher = NULL;
+  /* Create an instance of the DES cipher */
+  CipherInterface* cipher = NULL;
 
-	//create variables for the cipher and mode
-	enum cipher argCipher;
-	unsigned char *argKey;
-	enum mode argMode;
-	unsigned char *argInputFile;
-	unsigned char *argOutputFile;
-	int blockSize=8;
-	ifstream inputFile;
-	ofstream outputFile;
+  // Create variables for the cipher and mode
+  enum cipher argCipher;
 
-	argKey = (unsigned char*)malloc(sizeof(unsigned char) * 8);
+  unsigned char* argKey = new unsigned char;
+  enum mode argMode;
+  unsigned char* argInputFile;
+  unsigned char* argOutputFile;
+  ifstream inputFile;
+  ofstream outputFile;
+  unsigned char* block;
+  unsigned char* text_buffer;
 
-	//parse arguments
+  // Parse arguments
 	if(!parseArguments(argc, argv, &argCipher, &argKey, &argMode, &argInputFile, &argOutputFile))
 	{
 		printf("Unable to parse arguments\n");
 		return 0;
 	}
 
-	//initialize the cipher
-	if(argCipher == aes)
-	{
-		cipher = new AES();
-		blockSize=16;
-	}
-	else if(argCipher == des)
-	{
-		blockSize=8;
-		cipher = new DES();
-	}
+	/* TODO I'm getting weird errors when I put this in the parseArguments function. See if anyone
+		 you guys can try to figure out how to get this code working in that function*/
 
-	/* Error checks */
-	if(!cipher)
-	{
-		fprintf(stderr, "ERROR [%s %s %d]: could not allocate memory\n",
-				__FILE__, __FUNCTION__, __LINE__);
-		exit(-1);
-	}
+	// Parse the key
+	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
+	//to indicate encryption or decryption
+  string key = argv[2];
 
-	/* Set the encryption key
-	 * A valid key comprises 16 hexidecimal
-	 * characters. Below is one example.
-	 * Your program should take input from
-	 * command line.
-	 */
-	printf("SET KEY: %s\n", argKey);
-	cipher->setKey(argKey);
+  if(argCipher == des)
+  {
 
-	//open the input and output files
+    for(int i = 0; i < 16; i++)
+
+    	argKey[i] = key[i];
+
+
+  }
+  else
+  {
+    if(argMode == encrypt)
+    {
+      argKey[0] = 0;
+    }
+    else
+    {
+      argKey[0] = 1;
+    }
+
+    for(int i = 0; i < 17; i++)
+      argKey[i] = key[i-1];
+
+  }
+
+  //initialize the cipher
+  if(argCipher == aes) { cipher = new AES(); }
+  else if(argCipher == des) { cipher = new DES(); }
+
+  /* Error checks */
+  if(!cipher)
+  {
+    fprintf(stderr, "ERROR [%s %s %d]: could not allocate memory\n",
+        __FILE__, __FUNCTION__, __LINE__);
+    exit(-1);
+  }
+
+  //open the input and output files
 	inputFile.open((char*)argInputFile);
 	outputFile.open((char*)argOutputFile);
 
@@ -213,149 +155,123 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	// TODO: implement this pseudocode
-	// ###############################
+  // Acquires the text of the file and its length
+  stringstream buffer;
+  buffer << inputFile.rdbuf();
+  string plainText(buffer.str());
 
-	// if DES
-		// SIZE = 8
-	// else
-		// SIZE = 16
+  int file_length = plainText.length() - 1;
 
-	// While there are still bytes in the input file, loop
-	//
-		// create a block datas tructure
-		// pad block to SIZE bytes
+  printf("SET KEY: %s\n", argKey);
+	cipher->setKey(argKey);
 
-		// create an output data structure
-		// if encrypting
-			// output = encrypt(stuff)
-		// else
-			// output = decrypt(stuff)
-
-		// write output to file
-
-	//perform encryption or decryption based on the argMode
-	if(argMode == encrypt)
-	{
-		//encrypt specific variables
-		char inputBlock[blockSize+1];
-		inputBlock[blockSize]='\0';
-		char* paddedPlainText = NULL;
-		int count = 0;
-		unsigned char* cipherText= NULL;
-		//read the data from the file
-		//loop while the input file is reading 8 characters (64 bits) at a time
-		printf("beging loop block size=%d\n",blockSize);
-		while(inputFile.read(inputBlock, blockSize))
-		{
-			printf("inputBlock number%d= %s\n",count, inputBlock);
-			count++;
-			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
-			strcat(paddedPlainText, inputBlock);
-			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
-			printf("input block number%d CT= %s\n",count-1, temp);
-			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
-			strcat((char*)cipherText,(char*) temp);
-		}
+  // Set up block and text buffer for AES/DES encryption or decryption
+  block = new unsigned char;
+  text_buffer = new unsigned char[17];
 
 
-		int len=sizeof(inputBlock)/sizeof(unsigned char);
-	//	if( len<blockSize){
-			printf("inputBlock number%d= %s\n",count, inputBlock);
-			pad_zero((unsigned char**)&inputBlock);
-			count++;
-			printf("input after padding:%s\n", inputBlock);
-			paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
-			strcat(paddedPlainText, inputBlock);
-			unsigned char* temp = cipher->encrypt((unsigned char*)inputBlock);
-			printf("CT of input block number%d= %s\n",count-1, temp);
-			cipherText=(unsigned char*)realloc(cipherText, count * sizeof(unsigned char*) *blockSize);
-			strcat((char*)cipherText,(char*) temp);
-	//	}
+  // AES encryption or decryption
+  if(argCipher == aes)
+  {
 
-		//with what is remaining in the inputBlock var after the loop terminates
-		//pad it and push it onto the plain text
-		//pad_zero((unsigned char**)&inputBlock);
-		//count++;
-		//paddedPlainText = (char*)realloc(paddedPlainText, count * sizeof(char*) * blockSize);
-		//strcat(paddedPlainText, inputBlock);
+    if(argMode == encrypt)
+    {
 
-		printf("PT: %s\n", paddedPlainText);
-		printf("CT: %s\n", cipherText);
+      for(int i = 0; i < file_length; i += 16)
+      {
+        memset(block, 0, 17);
 
+        for(int j = 0; j < 16; j++)
+          block[j] = plainText[i + j];
 
-		if(cipherText != NULL)
-		{
-			//write to output file
-			int i = 0;
-			while(cipherText[i] != '\0')
-			{
-				outputFile.put(cipherText[i]);
-				i++;
-			}
-		}
-		else
-		{
-			printf("ERROR: result of encryption is NULL\n");
-		}
+        memset(text_buffer, 0, 17);
 
-		//free the
-		free(paddedPlainText);
-		free(cipherText);
-	}
-	else if(argMode == decrypt)
-	{
-		//decrypt specific variables
-		char inputBlock[blockSize+1];
-		inputBlock[blockSize]='\0';
-		char* cipherText = NULL;
-		int count = 0;
-		unsigned char* plainText=NULL;
-		//read the data from the file
-		//loop while the input file is reading 8 characters (64 bits) at a time
-		while(inputFile.read(inputBlock, blockSize))
-		{
-			printf("inputBlock number%d= %s\n",count, inputBlock);
-			count++;
-			unsigned char* temp=cipher->decrypt((unsigned char*)inputBlock);
-			cipherText = (char*)realloc(cipherText, count * sizeof(char*) * blockSize);
-			strcat(cipherText, inputBlock);
-			plainText = (unsigned char*)realloc(plainText, count * sizeof(unsigned char*) * blockSize);
-			strcat((char*)plainText,(char*) temp);
-			printf("inputBlock number%d decrypted= %s\n",count-1, temp);
-		}
+        text_buffer = cipher->encrypt(block);
 
+        for(int j = 0; j < 16; j++)
+          outputFile << text_buffer[j];
 
+        outputFile.flush();
+      }
 
-		printf("CT:%s\n",cipherText);
-		printf("PT:%s\n", plainText);
-		if(plainText != NULL)
-		{
+      printf("AES Encryption Successful!\n");
 
+    }
+    else if(argMode == decrypt)
+    {
 
-			//write to output file
-			int i = 0;
-			while(plainText[i] != '\0')
-			{
-				outputFile.put(plainText[i]);
-				i++;
-			}
-		}
-		else
-		{
-			printf("ERROR: result of decryption is NULL\n");
-		}
+			// TODO THE PROBLEM LIES IN THIS BLOCK OF CODE
+      for(int i = 0; i < file_length; i += 16)
+      {
+        memset(block, 0, 17);
 
-		//clean up memory
-		free(cipherText);
+        for(int j = 0; j < 16; j++)
+          block[j] = plainText[i + j];
 
-		return 0;
-	}
-	else
-	{
-		printf("This should be un-reachable code\n");
-		exit(-1);
-	}
+        memset(text_buffer, 0, 17);
 
-	free(argKey);
+        text_buffer = cipher->decrypt(block);
+
+        for(int j = 0; j < 16; j++)
+          outputFile << text_buffer[j];
+
+        outputFile.flush();
+      }
+
+      printf("AES Decryption Successful!\n");
+    }
+
+  }
+  //DES encryption or decryption
+  else if(argCipher == des)
+  {
+    // Executes DES Encryption
+    if(argMode == encrypt)
+    {
+
+      for(int i = 0; i < file_length; i += 8)
+      {
+          for(int j = 0; j < 8; j++)
+            block[j] = plainText[i + j];
+
+          text_buffer = cipher->decrypt(block);
+
+          for(int j = 0; j < 8; j++)
+            outputFile << text_buffer[j];
+      }
+
+      printf("DES Encryption Successful!\n");
+
+    }
+    else if(argMode == decrypt)
+    {
+      // Executes DES Decryption
+      for(int i = 0; i < file_length; i += 8)
+      {
+          for(int j = 0; j < 8; j++)
+            block[j] = plainText[i + j];
+
+          text_buffer = cipher->encrypt(block);
+
+          for(int j = 0; j < 8; j++)
+            outputFile << text_buffer[j];
+      }
+
+      printf("DES Decryption Successful!\n");
+    }
+  }
+  else
+  {
+    printf("This should be un-reachable code\n");
+    exit(-1);
+  }
+
+  free(argKey);
+  free(block);
+  free(text_buffer);
+
+  inputFile.close();
+  outputFile.close();
+
+  return 0;
 }
