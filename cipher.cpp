@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   // Create variables for the cipher and mode
   enum cipher argCipher;
 
-  unsigned char* argKey = new unsigned char;
+  unsigned char* argKey;
   enum mode argMode;
   unsigned char* argInputFile;
   unsigned char* argOutputFile;
@@ -102,6 +102,7 @@ int main(int argc, char** argv)
 
   if(argCipher == des)
   {
+		argKey = new unsigned char[16];
 
     for(int i = 0; i < 16; i++)
 
@@ -111,17 +112,21 @@ int main(int argc, char** argv)
   }
   else
   {
+
+		argKey = new unsigned char[17];
+
+
     if(argMode == encrypt)
     {
-      argKey[0] = 0;
+      argKey[0] = '0';
     }
     else
     {
-      argKey[0] = 1;
+      argKey[0] = '1';
     }
 
-    for(int i = 0; i < 17; i++)
-      argKey[i] = key[i-1];
+    for(int i = 1; i < 17; i++)
+			argKey[i] = key[i-1];
 
   }
 
@@ -200,20 +205,19 @@ int main(int argc, char** argv)
     else if(argMode == decrypt)
     {
 
-			// TODO THE PROBLEM LIES IN THIS BLOCK OF CODE
       for(int i = 0; i < file_length; i += 16)
       {
         memset(block, 0, 17);
 
         for(int j = 0; j < 16; j++)
-          block[j] = plainText[i + j];
+					block[j] = plainText[i + j];
 
         memset(text_buffer, 0, 17);
 
         text_buffer = cipher->decrypt(block);
 
         for(int j = 0; j < 16; j++)
-          outputFile << text_buffer[j];
+					outputFile << text_buffer[j];
 
         outputFile.flush();
       }
