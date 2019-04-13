@@ -93,7 +93,11 @@ int main(int argc, char** argv)
 	}
 
 	/* TODO I'm getting weird errors when I put this in the parseArguments function. See if anyone
+<<<<<<< HEAD
 		 you guys can try to figure out how to get this code working in that function*/
+=======
+		 you guys can try to figure out how to code*/
+>>>>>>> ba0533986018e9aab41b2855dd87f6765f0f4222
 
 	// Parse the key
 	//if the cipher is aes then we need to add a '0' or '1' onto the front of the key
